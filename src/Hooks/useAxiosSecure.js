@@ -8,7 +8,7 @@ const axiosSecure = axios.create({
 });
 
 const useAxiosSecure = () => {
-  const { logout } = useContext(AuthContext);
+  const { logOut } = useContext(AuthContext);
   const navigate = useNavigate();
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -26,18 +26,17 @@ const useAxiosSecure = () => {
       (response) => response,
       async (error) => {
         if (
-          error.response &&
-          error.response.status === 401 &&
+          (error.response && error.response.status === 401) ||
           error.response.status === 403
         ) {
-          await logout();
+          localStorage.removeItem("token");
           navigate("/login");
         }
 
         return Promise.reject(error);
       }
     );
-  }, [axiosSecure, logout, navigate]);
+  }, [axiosSecure, logOut, navigate]);
 
   return [axiosSecure];
 };

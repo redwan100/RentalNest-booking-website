@@ -14,6 +14,7 @@ const addRoom = async (roomData) => {
 export const getAllRooms = async () => {
   const res = await fetch(`${import.meta.env.VITE_API_URL}/all-rooms`);
   const data = await res.json();
+  console.log(data);
 
   return data;
 };

@@ -1,19 +1,31 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { AuthContext } from "../../providers/AuthProvider";
 import RoomDataRow from "../../components/Dashboard/RoomDataRow";
 import EmptyState from "../../components/Shared/EmptyState";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
+import { useQuery } from "@tanstack/react-query";
+import Loader from "../../components/Shared/Loader";
 
 const MyListings = () => {
   const { user } = useContext(AuthContext);
-  const [rooms, setRooms] = useState([]);
   const [axiosSecure] = useAxiosSecure();
 
-  useEffect(() => {
-    axiosSecure.get(`/rooms/${user?.email}`).then((res) => {
-      setRooms(res.data);
-    });
-  }, [user]);
+  const {
+    data: rooms = [],
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["myListings", user?.email],
+    queryFn: async () => {
+      const data = await axiosSecure.get(`/rooms/${user?.email}`);
+      console.log(data.data);
+      return data.data;
+    },
+  });
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <>
@@ -73,7 +85,11 @@ const MyListings = () => {
                     {/* Table Data */}
                     {rooms &&
                       rooms.map((room) => (
-                        <RoomDataRow key={room._id} room={room} />
+                        <RoomDataRow
+                          key={room._id}
+                          room={room}
+                          refetch={refetch}
+                        />
                       ))}
                   </tbody>
                 </table>

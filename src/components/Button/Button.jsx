@@ -1,4 +1,12 @@
-const Button = ({ label, onClick, disabled, outline, small, icon: Icon }) => {
+const Button = ({
+  label,
+  onClick,
+  disabled,
+  outline,
+  booked,
+  small,
+  icon: Icon,
+}) => {
   return (
     <button
       disabled={disabled}
@@ -31,7 +39,7 @@ const Button = ({ label, onClick, disabled, outline, small, icon: Icon }) => {
             "
         />
       )}
-      {label}
+      {booked ? "Booked" : label}
     </button>
   );
 };

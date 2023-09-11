@@ -83,6 +83,7 @@ const RoomReservation = ({ roomData }) => {
             onClick={() => setIsOpen(true)}
             disabled={roomData.host.email === user?.email || roomData?.booked}
             label="Reserve"
+            booked={roomData?.booked}
           />
         </div>
         <hr />

@@ -1,20 +1,32 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../../providers/AuthProvider";
-import { getBookingRoom } from "../../api/booking";
 import TableRow from "../../components/Dashboard/TableRow";
 import EmptyState from "../../components/Shared/EmptyState";
-
+import { useQuery } from "@tanstack/react-query";
+import useAxiosSecure from "../../Hooks/useAxiosSecure";
+import Loader from "../../components/Shared/Loader";
 const MyBookings = () => {
   const { user } = useContext(AuthContext);
-  const [bookings, setBookings] = useState([]);
 
-  const fetchBookings = () => {
-    getBookingRoom(user?.email).then((data) => setBookings(data));
-  };
+  const [axiosSecure] = useAxiosSecure();
 
-  useEffect(() => {
-    fetchBookings();
-  }, [user]);
+  const {
+    data: bookings = [],
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["bookings", user?.email],
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/my-bookings-room/${user?.email}`);
+
+      return res.data;
+    },
+  });
+
+  if (isLoading) {
+    return <Loader />;
+  }
+
   return (
     <>
       {bookings && Array.isArray(bookings) && bookings.length > 0 ? (
@@ -68,9 +80,9 @@ const MyBookings = () => {
                     {bookings &&
                       bookings?.map((booking) => (
                         <TableRow
+                          refetch={refetch}
                           key={booking._id}
                           booking={booking}
-                          fetchBookings={fetchBookings}
                         />
                       ))}
                   </tbody>

@@ -1,21 +1,34 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { AuthContext } from "../../providers/AuthProvider";
-import { getBookedRoom } from "../../api/booking";
-import RoomDataRow from "../../components/Dashboard/RoomDataRow";
+
 import EmptyState from "../../components/Shared/EmptyState";
 import BookingDataRow from "../../components/Dashboard/BookingDataRow";
+import useAxiosSecure from "../../Hooks/useAxiosSecure";
+import { useQuery } from "@tanstack/react-query";
+import Loader from "../../components/Shared/Loader";
 
 const ManageBookings = () => {
   const { user } = useContext(AuthContext);
-  const [bookedRoom, setBookedRoom] = useState([]);
+  const [axiosSecure] = useAxiosSecure();
 
-  const fetchRooms = () => {
-    getBookedRoom(user?.email).then((data) => setBookedRoom(data));
-  };
+  const {
+    data: bookedRoom = [],
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["bookedRoom", user?.email],
+    queryFn: async () => {
+      const res = await axiosSecure.get(
+        `${import.meta.env.VITE_API_URL}/booked-room?email=${user?.email}`
+      );
 
-  useEffect(() => {
-    fetchRooms();
-  }, [user]);
+      return res.data;
+    },
+  });
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <>
@@ -77,7 +90,7 @@ const ManageBookings = () => {
                         <BookingDataRow
                           key={room._id}
                           room={room}
-                          fetchRooms={fetchRooms}
+                          refetch={refetch}
                         />
                       ))}
                   </tbody>

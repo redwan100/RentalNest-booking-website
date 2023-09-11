@@ -32,7 +32,7 @@ const MenuDropdown = () => {
         <div className="hidden md:block text-sm font-semibold py-3 px-6 rounded-full hover:bg-neutral-100 transition cursor-pointer">
           {!role && (
             <button disabled={!user} onClick={() => setModal(true)}>
-              AirCNC your home
+              RentalNest your home
             </button>
           )}
         </div>

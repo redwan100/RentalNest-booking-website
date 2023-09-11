@@ -4,29 +4,41 @@ import Card from "./Card";
 import Loader from "../Shared/Loader";
 import { useSearchParams } from "react-router-dom";
 import Heading from "../Heading/Heading";
-import { getAllRooms } from "../../api/rooms";
+import axios from "axios";
+// import { getAllRooms } from "../../api/rooms";
 
-const Rooms = () => {
+const Rooms = ({ selected }) => {
   const [params, setParams] = useSearchParams();
-  const category = params.get("category");
+  // const category = params.get("category");
 
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
-    setLoading(true);
-    getAllRooms()
-      .then((data) => {
-        if (category) {
-          const filtered = data.filter((room) => room.category === category);
-          setRooms(filtered);
-        } else {
-          setRooms(data);
-        }
+    // setLoading(true);
+    // getAllRooms()
+    //   .then((data) => {
+    //     if (category) {
+    //       const filtered = data.filter((room) => room.category === category);
+    //       setRooms(filtered);
+    //     } else {
+    //       setRooms(data);
+    //     }
+    //     setLoading(false);
+    //   })
+    //   .catch((err) => console.log(err));
+    getAllRooms();
+  }, [selected]);
 
-        setLoading(false);
-      })
-      .catch((err) => console.log(err));
-  }, [category]);
+  const getAllRooms = async () => {
+    setLoading(true);
+    const res = await axios.get(
+      `${import.meta.env.VITE_API_URL}/all-rooms?category=${selected}`
+    );
+    const data = await res.data;
+    setLoading(false);
+    console.log(data);
+    setRooms(data);
+  };
 
   if (loading) {
     return <Loader />;
